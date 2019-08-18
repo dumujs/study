@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script>
+			function sebian(){
+				if(div.offsetTop < 0) {
+						div.style.marginTop = 0 + 'px';
+
+					}
+					if(div.offsetTop > 450) {
+						div.style.marginTop = 450 + 'px';
+
+					}
+					if(div.offsetLeft < 0) {
+						div.style.marginLeft = 0 + 'px';
+
+					}
+					if(div.offsetLeft > 750) {
+						div.style.marginLeft = 750 + 'px';
+
+					}
+					if(div.offsetTop == 0 || div.offsetLeft == 0 || div.offsetTop == 450 || div.offsetLeft == 750) {
+						var i = 255 * Math.random();
+						var j = 255 * Math.random();
+						var k = 255 * Math.random();
+						div.style.background = 'rgba(' + i + ',' + j + ',' + k + ')';
+						wrap.style.borderColor = 'rgba(' + i + ',' + j + ',' + k + ')';
+
+					}
+			}
+		</script>
+		<!--拖动箱子-->
+		<style type="text/css">
+			body {
+				overflow: hidden;
+			}
+			
+			div {
+				margin: 0;
+				padding: 0;
+				/*display: none;*/
+			}
+			
+			#wrap {
+				width: 800px;
+				height: 500px;
+				margin: 50px auto;
+				border: 5px solid black;
+				position: relative;
+			}
+			
+			#div {
+				width: 50px;
+				height: 50px;
+				background: red;
+				border-radius: 50%;
+				color: white;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="wrap">
+			<div id="div">
+				<!--变色狂魔-->
+			</div>
+
+		</div>
+		<script>
+			var wrap = document.getElementById('wrap');
+			var odiv=document.getElementsByTagName('div');
+			console.log(odiv);
+			var div = document.getElementById('div');
+			var dir;
+			var speed=10;
+			div.onmousedown = function(e) {
+				var et = e || window.event;
+				var x = et.clientX;
+				var y = et.clientY;
+				console.log('client', x, y);
+				var ofy = this.offsetTop;
+				var ofx = this.offsetLeft;
+				console.log(ofx);
+				console.log(ofy);
+				window.onmousemove = function(e) {
+					var et = e || window.event;
+					var x1 = et.clientX;
+					var y1 = et.clientY;
+					console.log(x, y);
+					div.style.marginTop = y1 - y + ofy + 'px';
+					div.style.marginLeft = x1 - x + ofx + 'px';
+					sebian();
+
+				}
+
+				//				div.onmouseup=function(e){
+				//					 div.onmousemove=null;
+				//					
+				//				}
+				window.onmouseup = function(e) {
+					window.onmousemove = null;
+
+				}
+			}
+			var time=setInterval(function(){
+				if(dir == 39) {
+						var ofx = div.offsetLeft;
+						div.style.marginLeft = ofx + speed + 'px';
+						if(div.offsetLeft + speed > 750) {
+							div.style.marginLeft = 750 + 'px';
+												sebian();
+
+						}
+
+				}
+				
+				if(dir == 37) {
+						var ofx = div.offsetLeft;
+						div.style.marginLeft = ofx - speed + 'px';
+						if(div.offsetLeft - speed< 0 ) {
+							div.style.marginLeft = 0 + 'px';
+							sebian();
+						}
+
+				}
+				if(dir == 38) {
+						var ofx = div.offsetTop;
+						div.style.marginTop = ofx -speed + 'px';
+						if(div.offsetTop - speed < 0) {
+							div.style.marginTop = 0 + 'px';
+												sebian();
+						}
+
+				}
+				if(dir == 40) {
+						var ofx = div.offsetTop;
+						div.style.marginTop = ofx + speed + 'px';
+						if(div.offsetTop +speed > 450) {
+							div.style.marginTop = 450 + 'px';
+												sebian();
+						}
+
+				}
+			},20)
+			
+			
+			window.onkeydown = function(e) {
+				var et = e || window.event;
+				dir=e.keyCode;
+				if(e.ctrlKey){
+					speed=20;
+				}else{
+					speed=10;
+				}
+				
+			}
+			window.onkeyup = function(e) {
+				var et = e || window.event;
+				dir=0;
+				
+			}
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,53 @@
+全局安装3步
+npm i webpack -g
+npm i webpack-cli -g
+npm i webpack-serve-dev -g
+
+创建webpack.config.js配置文件
+下载webpack相关依赖模块
+src 开发环境
+打包入口main.js文件
+
+
+webpack.config.js内容
+entry：_dirpath+'/main.js'
+
+
+output:{
+	path：_dirpath+'/dist',
+	filename:'name.js',
+},
+devServer:{
+	host:'localhost',
+	port:'8080',
+	open:true//默认自动打开
+}
+
+//热加载   只更新改变的部分
+//引入html-webpack-plugin和webpack 用require引入import出错
+plugins[
+	new webpack.HotModuleRepladementPlugin(),
+	new HtmlWebpackPugin({
+		template:_dirpath+xxx
+	})
+]
+module：{
+	rules：[
+		{
+			test:/\.css$/,
+			use:['style-loader','css-loader']//也是依赖
+		}
+	]
+	
+}
+webpack打包
+
+
+package.json中
+
+
+
+webpack最初打包加密js文件
+ 
+工作中将dist文件发给经理或者后台 
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			div{
+				width:500px;
+				white-space: normal;
+				border:1px solid ;
+				
+			}
+		</style>
+	</head>
+	<body>
+		
+		<script>
+//			素筛法1亿用时5到6秒
+			var result=document.getElementById('result');
+			var sushu=[];
+			var max=100000000;
+			var len=Math.sqrt(max);
+			var s=0;
+			console.time();
+			for(var i=2;i<=max;i++){
+				sushu[i]=1;
+			}
+			console.timeEnd();
+			console.time();
+			for(var i=2;i<=len;i++){
+				if(sushu[i]){
+					for(var j=2*i;j<max;j+=i){
+						sushu[j]=0; 
+					}
+				}
+			} 
+			
+			for(var i=2;i<=max;i++){
+				if(sushu[i]){
+					s++;
+//					document.write(i+'<br />')打印会崩溃的；
+				}
+			}
+			console.log(s);//素数个数
+			console.timeEnd();
+		</script>
+	</body>
+</html>

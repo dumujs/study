@@ -1,0 +1,484 @@
+<html>
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>eluosi</title>
+		<style type="text/css">
+			span {
+				margin-right: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<script>
+			var eluosi;
+			var eluosi_ctx;
+			var ROWS = 20;
+			var COLS = 14;
+			var SIZE = 25;
+			var KONG = 0;
+			var speed = 1;
+			var score;
+			var heightScore;
+			var droping;
+			var isPlaying = true;
+			//定时器
+			var dropTimer;
+			colors = ['#fff', '#f00', '#00f', '#0f0', '#ff0', '#f00', '#00f', '#0f0'];
+			var arr = [];
+			//清空数组arr
+			for(var i = 0; i < ROWS; i++) {
+				arr[i] = [];
+				for(var j = 0; j < COLS; j++) {
+					arr[i][j] = KONG;
+				}
+			}
+			var allRect = [
+			//一字型
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 1
+					},
+					{
+						x: COLS / 2,
+						y: 1,
+						color: 1
+					},
+					{
+						x: COLS / 2,
+						y: 2,
+						color: 1
+					},
+					{
+						x: COLS / 2,
+						y: 3,
+						color: 1
+					}
+				],
+				//田字
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 2
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 0,
+						color: 2
+					},
+					{
+						x: COLS / 2,
+						y: 1,
+						color: 2
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 1,
+						color: 2
+					}
+				],
+				//7字型
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 3
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 0,
+						color: 3
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 1,
+						color: 3
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 2,
+						color: 3
+					}
+				],
+				//拐角
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 4
+					},
+					{
+						x: COLS / 2,
+						y: 1,
+						color: 4
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 1,
+						color: 4
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 2,
+						color: 4
+					}
+				],
+				//反拐角
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 5
+					},
+					{
+						x: COLS / 2,
+						y: 1,
+						color: 5
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 1,
+						color: 5
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 2,
+						color: 5
+					}
+				],
+				//反7
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 6
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 0,
+						color: 6
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 1,
+						color: 6
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 2,
+						color: 6
+					}
+				],
+				//土字型
+				[{
+						x: COLS / 2,
+						y: 0,
+						color: 7
+					},
+					{
+						x: COLS / 2 - 1,
+						y: 1,
+						color: 7
+					},
+					{
+						x: COLS / 2,
+						y: 1,
+						color: 7
+					},
+					{
+						x: COLS / 2 + 1,
+						y: 1,
+						color: 7
+					}
+				],
+			];
+			function getDrop() {
+				var rand = parseInt(allRect.length * Math.random());
+				droping = [{
+						x: allRect[rand][0].x,
+						y: allRect[rand][0].y,
+						color: allRect[rand][0].color
+					},
+					{
+						x: allRect[rand][1].x,
+						y: allRect[rand][1].y,
+						color: allRect[rand][1].color
+					},
+					{
+						x: allRect[rand][2].x,
+						y: allRect[rand][2].y,
+						color: allRect[rand][2].color
+					},
+					{
+						x: allRect[rand][3].x,
+						y: allRect[rand][3].y,
+						color: allRect[rand][3].color
+					}
+				];
+			}
+				//制作空表格
+				function makeCanvas(col, row, cellheight, cellwidth) {
+					eluosi = document.createElement('canvas');
+					eluosi.width = col * cellwidth;
+					eluosi.height = row * cellheight;
+					eluosi.style.border = '2px solid';
+					eluosi_ctx = eluosi.getContext('2d');
+					eluosi_ctx.beginPath();
+					for(var i = 1; i < row; i++) {
+						eluosi_ctx.moveTo(0, i * cellheight);
+						eluosi_ctx.lineTo(col * cellwidth, i * cellheight);
+					}
+					for(var i = 1; i < col; i++) {
+						eluosi_ctx.moveTo(i * cellwidth, 0);
+						eluosi_ctx.lineTo(i * cellwidth, row * cellheight);
+					}
+					eluosi_ctx.strokeStyle = '#dcdcdc';
+					eluosi_ctx.stroke();
+				}
+				function showCanvas() {
+					for(var i = 0; i < ROWS; i++) {
+						for(var j = 0; j < COLS; j++) {
+							if(arr[i][j] != KONG) {
+								eluosi_ctx.fillStyle = colors[arr[i][j]];
+								eluosi_ctx.fillRect(j * SIZE + 1, i * SIZE + 1, SIZE - 2, SIZE - 2);
+							} else {
+								eluosi_ctx.fillStyle = colors[arr[i][j]];
+								eluosi_ctx.fillRect(j * SIZE + 1, i * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+						}
+					}
+				}
+				window.onload = function() {
+					var heightScore = document.getElementById('heightScore');
+					var curscore = document.getElementById('curscore');
+					var curspeed = document.getElementById('curspeed');
+					var heightScore = document.getElementById('heightScore');
+					makeCanvas(COLS, ROWS, SIZE, SIZE);
+					document.body.appendChild(eluosi);       
+					var newArr = localStorage.getItem('arr');
+					arr = (newArr == null) ? arr : JSON.parse(newArr);
+					showCanvas();
+					//绘制获取到的内容图形
+					getDrop();
+					dropTimer = setInterval(moveDown, 500 / speed);
+					var lastscore=parseInt(localStorage.score)||0;
+					curscore.innerHTML=score=lastscore;
+					var lastH=localStorage.getItem('heightScore')||0;
+					heightScore.innerHTML=lastH;
+					function moveDown() {
+						var candown = true;
+						//判断是否到底
+						for(var i = 0; i < droping.length; i++) {
+							if(droping[i].y >= ROWS - 1) {
+								candown = false;
+								break;
+							}
+							//底下是否
+							if(arr[droping[i].y + 1][droping[i].x] != KONG) {
+								candown = false;
+								break;
+							}
+						}
+						if(candown) {
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = 'white';
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								now.y++;
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = colors[now.color];
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+						} else {
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								//到顶游戏结束
+								if(now.y < 1) {
+									localStorage.removeItem('arr');
+									localStorage.removeItem('score');
+									isPlaying = false;
+									clearInterval(dropTimer);
+									if(confirm('结束le！要排名吗')){
+										var lastHeight=localStorage.getItem('heightScore')||0;
+										if(score>lastHeight){
+											localStorage.setItem('heightScore',score);
+										}
+									}
+									return;
+								}
+								arr[now.y][now.x] = now.color;
+							}
+							isFull();
+							localStorage.setItem('arr', JSON.stringify(arr));
+							localStorage.setItem('score',score);
+							getDrop();
+						}
+					}
+					//判断是否满了
+					function isFull() {
+						for(var i = 0; i < ROWS; i++) {
+							var full = true;
+							for(var j = 0; j < COLS; j++) {
+								if(arr[i][j] == KONG) {
+									full = false;
+									break;
+								}
+							}
+							if(full) {
+								curscore.innerHTML = score += 100;
+								console.log(score);
+								for(var j = i; j > 0; j--) {
+									for(var k = 0; k < COLS; k++) {
+										arr[j][k] = arr[j - 1][k];
+									}
+								}
+							}
+						}
+						showCanvas();
+					}
+					//顺时针旋转
+					function change() {
+						var canchange = true;
+						for(var i = 0; i < droping.length; i++) {
+								var nowX = droping[i].x;
+								var nowY = droping[i].y;
+								if(droping[2].x - (droping[2].y - nowY)<0||droping[2].x - (droping[2].y - nowY)>COLS){
+									canchange=false;
+									break;
+								}
+								if(droping[2].y + (droping[2].x - nowX)>=ROWS){
+									canchange=false;
+									break;
+								}
+								if(arr[droping[2].y + (droping[2].x - nowX)][droping[2].x - (droping[2].y - nowY)]!=KONG){
+									canchange=false;
+									break;
+								}
+							}
+						if(canchange) {
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = 'white';
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var nowX = droping[i].x;
+								var nowY = droping[i].y;
+								droping[i].x = droping[2].x - (droping[2].y - nowY);
+								droping[i].y = droping[2].y + (droping[2].x - nowX);
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = colors[droping[i].color];
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+						}
+					}
+
+					function moveLeft() {
+						var canleft = true;
+						for(var i = 0; i < droping.length; i++) {
+							var now = droping[i];
+							if(now.x <= 0) {
+								canleft = false;
+								break;
+							}
+							if(arr[now.y][now.x - 1] != KONG) {
+								canleft = false;
+								break;
+							}
+						}
+						if(canleft) {
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = 'white';
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								now.x--;
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = colors[now.color];
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+						}
+					}
+
+					function moveRight() {
+						var canright = true;
+						for(var i = 0; i < droping.length; i++) {
+							var now = droping[i];
+							if(now.x >= COLS) {
+								canright = false;
+								break;
+							}
+							if(arr[now.y][now.x + 1] != KONG) {
+								canright = false;
+								break;
+							}
+						}
+						if(canright) {
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = 'white';
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								now.x++;
+							}
+							for(var i = 0; i < droping.length; i++) {
+								var now = droping[i];
+								eluosi_ctx.fillStyle = colors[now.color];
+								eluosi_ctx.fillRect(now.x * SIZE + 1, now.y * SIZE + 1, SIZE - 2, SIZE - 2);
+							}
+						}
+					}
+					window.onkeydown = function(e) {
+						var e = e || window.event;
+						switch(e.keyCode) {
+							case 37:
+								if(isPlaying) {
+									moveLeft();
+								}
+								break;
+							case 38:
+								if(isPlaying) {
+									change();
+								}
+								break;
+
+							case 39:
+								if(isPlaying) {
+									moveRight();
+								}
+								break;
+
+							case 40:
+								if(isPlaying) {
+									moveDown();
+								}
+								break;
+						}
+					}
+				}
+		</script>
+		<h3>俄罗斯方块</h3>
+		<div>
+			速度：<span id="curspeed">1</span>分数：<span id="curscore">0</span>最高分：<span id="heightScore">0
+				
+			</span>
+		</div>
+
+	</body>
+
+</html>

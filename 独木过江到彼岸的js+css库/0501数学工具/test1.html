@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!--主要内容-->
+		<!--一、if(a==1&&1==2&&a==3)有可能成立吗？-->
+		<!--二、let与var的区别-->
+		<!--主要内容-->
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			ul{
+				margin: 20px;
+				min-height:10px;
+				border: solid 1px;
+			}
+			li{
+				background: #dcdcdc;
+				width:200px;
+				color:red;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			//设计一个可以使得if(a==1&&a==2&&a==3)的条件返回true的情况
+			document.write('<h2>'+'//设计一个可以使得if(a==1&&a==2&&a==3)的条件返回true的情况'+'</h2>');
+			var a={
+				i:1,
+				toString:function(){
+					
+					return a.i++;
+				}
+			}
+			if(a==1&&a==2&&a==3&&a==4){
+				//js中==运算符会将两边数据转换为同类型在进行比较
+				console.group('第一种方法');
+				console.log('a',a);
+				console.log('a',a);
+				console.log('a',a);
+				console.log('a',a);
+				console.groupEnd();
+			}
+			//方法2使用get
+			let val=0;
+			Object.defineProperty(window,'b',{
+				get:function(){
+					return ++val;
+				}
+			});
+			if(b==1&&b==2&&b==3&&b==4){
+				console.group('第二种方法');
+				console.log('b',b);
+				console.log('b',b);
+				console.groupEnd();
+			}
+			 
+			if(b===7&&b===8&&b===9&&b===10){
+				console.group('第二种方法===亦可以');
+				console.log('b',b);
+				console.log('b',b);
+				console.groupEnd();
+			}
+			//第三种方法
+			let c=[1,2,3];
+			
+			a.join=a.shift;
+			if(c==1&&c==2&&c==3){
+				console.group('第二种方法');
+				console.log('c',c);
+				console.groupEnd();
+				
+			}
+			//let与var的区别：var的作用域是会提升的，只能作用域全局或者整个函数块
+			  				//let声明一个作用域被限制在块级中的变量、语句或表达式
+			for(var i=0;i<5;i++)//i被提升为全局变量
+			{
+				
+			}
+			console.group('let与var的区别');
+			console.log('i', typeof i,i);
+			console.log('i',typeof(this.i),this.i);//this的用法
+			for(let j=0;j<5;j++)//循环结束后j为undefined
+			{
+				
+			}
+			//console.log('j', typeof j,j);报错j is not defined
+			
+			
+		</script>
+		
+		<ul id="test" onclick="add()"title='点击添加一个li'>
+			 
+			<li>第1个li</li>
+		</ul>
+		<p onclick="del()" style="width:100px;border:solid 1px;">
+			<a href="#">太多了删除</a>
+			
+		</p>
+		<script>
+//			var uLi=document.getElementById('test').getElementsByTagName('li');
+//			    longth=uLi.length;
+//			    console.log('longth',longth);
+//			for(var i=0;i<longth;i++){
+//				uLi[i].onclick=function(event){
+//					console.log('i',i);
+//					document.getElementById('test').getElementsByTagName('li').innerHTML='<span>'+i+'</span>';
+//				}
+//			}
+//			for(let j=0;j<longth;j++){
+//				uLi[j].onclick=function(event){
+//					console.log('j',j);
+//					document.getElementById('test').innerHTML+='<li>'+'第'+j+'个li'+'</li>';
+//					uLi=document.getElementById('test').getElementsByTagName('li');
+//				    longth=uLi.length;
+//				    console.log('longth',longth);
+//				    console.log('uLi',uLi);
+//					
+//				}
+//				
+//			}
+
+//以上为测试let与var的区别
+
+
+			function add(){
+					let uLi=document.getElementById('test').getElementsByTagName('li'),
+				    longth=uLi.length;
+					document.getElementById('test').innerHTML+='<li>'+'第'+(longth+1)+'个li'+'</li>';
+			}
+			function del(){
+					let uLi=document.getElementById('test').getElementsByTagName('li'),
+					ul=document.getElementById('test'),
+				    longth=uLi.length;
+					//document.getElementById('test').innerHTML='';将li全部删除
+					ul.removeChild(ul.children[longth-1]);
+			}
+		</script>
+	</body>
+</html>

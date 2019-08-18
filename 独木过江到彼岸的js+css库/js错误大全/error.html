@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+</head>
+<body>
+	<a href="#dfldfdk">dfdfdf</a>
+	<script>
+		/*
+		 * Error.name的六种值对应的信息：
+			        1、EvalError : eval()的使用与定义不一致；
+			        2、RangeError : 数值越界
+			        3、ReferenceError :非法或不能识别引用数值  （当一个变量未经声明就使用）
+			        4、SyntaxError : 发生语法解析错误     
+			        5、TypeError ： 操作数类型错误
+			        6、URUError ：URI处理函数使用不当 （地址发生错误）
+			--------------------- 
+			作者：min_dreamer 
+			来源：CSDN 
+			原文：https://blog.csdn.net/qq_41713692/article/details/80558580 
+			版权声明：本文为博主原创文章，转载请附上博文链接！
+		 */
+		//1.ReferenceError
+		try{
+			console.log(sb);
+		}catch(e){
+			console.log(e)
+		}
+		//2.TypeErroe
+			//错误产生：产生了环形引用，然后再进行JSON转换（JSON.stringify）时产生错误，
+			//如下面代码所示，a和b进行了相互引用，因此不能转换为JSON。
+		try{
+			let a={};
+			let b={a};
+			a.b=b;
+			console.log(JSON.stringify(b));
+			
+		}catch(e){
+			console.log(e)
+		}
+		//3.SyntaxError : 发生语法解析错误   
+//		try{
+//			var 1;     // Uncaught SyntaxError: Unexpected number
+//			var 1a;    // Uncaught SyntaxError: Invalid or unexpected token
+//			// 2) 给关键字赋值
+//			function = 5;
+//		}catch(e){
+//			console.log(e)
+//		}
+		//4.RangeError
+		try{
+			// RangeError: 范围错误(参数超范围)
+			// 主要的有几种情况，第一是数组长度为负数，第二是Number对象的方法参数超出范围，以及函数堆栈超过最大值。
+			// 1) 数组长度为负数
+			[].length = -5      // Uncaught RangeError: Invalid array length
+			// 2) Number对象的方法参数超出范围
+			var num = new Number(12.34)
+			console.log(num.toFixed(-1))   // Uncaught RangeError: toFixed() digits argument must be between 0 and 20 at Number.toFixed
+			// 说明: toFixed方法的作用是将数字四舍五入为指定小数位数的数字,参数是小数点后的位数,范围为0-20.
+		}catch(e){
+			console.log(e)
+		}
+		//5.evalError
+		try{
+			// EvalError: 非法调用 eval()
+			new Error([message[fileName[lineNumber]]])
+			// 第一个参数表示错误提示信息，第二个是文件名，第三个是行号。
+			// 在ES5以下的JavaScript中，当eval()函数没有被正确执行时，会抛出evalError错误。例如下面的情况：
+			var myEval = eval;
+			myEval("alert('call eval')");
+			// 需要注意的是：ES5以上的JavaScript中已经不再抛出该错误，但依然可以通过new关键字来自定义该类型的错误提示。以上的几种派生错误，连同原始的Error对象，都是构造函数。开发者可以使用它们，认为生成错误对象的实例。
+		}catch(e){	
+			console.log(e)
+		}
+		try{
+			// URIError: URI不合法
+			// 主要是相关函数的参数不正确。
+			decodeURI("%")     // Uncaught URIError: URI malformed at decodeURI
+			// jzz
+		}catch(e){	
+			console.log(e)
+		}
+		//decodeURL对应encodeURL解密和加密地址
+		console.log(decodeURI(window.location.href));
+		console.log(window.location);
+		try{
+			let {aaa};
+			console.log(aaa)
+		}catch(e){
+			console.log(e)
+		}
+	</script>
+	
+	
+</body>
+</html>

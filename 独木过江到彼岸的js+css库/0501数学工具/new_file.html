@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!--数学工具大全-->
+	</head>
+	<body>
+		<script>
+			//数学中的一些常量e,pi,根号2等
+			
+			document.write('Math.E='+Math.E+'<br/>');
+			document.write('Math.PI='+Math.PI+'<br/>');
+			document.write('Math.LN2='+Math.LN2+'<br/>');
+			document.write('Math.LN10='+Math.LN10+'<br/>');
+			document.write('Math.LOG2E='+Math.LOG2E+'<br/>');
+			document.write('Math.LOG10E='+Math.LOG10E+'<br/>');
+			document.write('Math.SQRT1_2='+Math.SQRT1_2+'<br/>');//根号2 的倒数
+			document.write('Math.SQRT2='+Math.SQRT2+'<br/>');
+			//Math中的方法
+			//基础方法
+			document.write('绝对值abs'+Math.abs(-2.0)+'<br/>');
+			document.write('不定参返回最大值'+Math.max(-2.0,4,6)+'<br/>');
+			document.write('返回最小值'+Math.min(-2.0,4,6)+'<br/>');
+			document.write('向上取整'+Math.ceil(-2.5)+'<br/>');
+			document.write('向下取整'+Math.floor(-2.5)+'<br/>');
+			document.write('四舍五入'+Math.round(-2.5)+'<br/>');
+			//指数、对数方法
+			document.write('e的指数'+Math.exp(1)+'<br/>');
+			document.write('普通指数'+Math.pow(2,4,3)+'<br/>');
+			document.write('正平方根'+Math.sqrt(2.0)+'<br/>');
+			document.write('自然对数'+Math.log(Math.E)+'<br/>');
+			document.write('常用对数'+Math.log10(10)+'<br/>');
+			document.write('以2为底数的对数'+Math.log2(2.0)+'<br/>');
+			//三角函数方法  
+			document.write('三角函数反余弦1=',Math.acos(1)+'<br/>');
+			document.write('三角函数反余弦0=',Math.acos(0)+'<br/>');
+			document.write('三角函数反正弦1=',Math.asin(1)+'<br/>');
+			document.write('三角函数反正弦0=',Math.asin(0)+'<br/>');
+			document.write('三角函数正切=',Math.atan(9999999)+'<br/>');
+			document.write('三角函数角度函数5，0=',Math.atan2(5,0)+'<br/>');
+			document.write('三角函数正弦pi/2=',Math.sin(Math.PI/2)+'<br/>');
+			document.write('三角函数正弦pi/6=',Math.sin(Math.PI/6)+'<br/>');
+			document.write('三角函数正弦0=',Math.sin(0)+'<br/>');
+			document.write('三角函数余弦pi/2=',Math.cos(Math.PI/2)+'<br/>');
+			document.write('三角函数余弦pi/3=',Math.cos(Math.PI/3)+'<br/>');
+			document.write('三角函数余弦0=',Math.cos(0)+'<br/>');
+			
+			//以下为双曲正余弦正余切函数方法不常用
+			document.write('三角函数atanh',Math.atanh(0)+'<br/>');
+			document.write('三角函数asinh',Math.asinh(0)+'<br/>');
+			document.write('三角函数asinh',Math.asinh(Math.PI/6)+'<br/>');
+			document.write('三角函数asinh',Math.asinh(0)+'<br/>');
+			document.write('三角函数acosh',Math.acosh(Math.PI)+'<br/>');
+			document.write('三角函数sinh',Math.sinh(Math.PI/2)+'<br/>');
+			document.write('三角函数sinh',Math.sinh(0)+'<br/>');
+			document.write('三角函数cosh',Math.cosh(Math.PI)+'<br/>');
+			document.write('三角函数cosh',Math.tanh(Math.PI)+'<br/>');
+			//			document.write('三角函数',Math.assign(5));
+//			document.write('三角函数',Math.create(Math.PI));
+			//伪随机数
+			document.write('随机数'+Math.random()+'<br />');
+			var a=10;
+			var b=10;
+			a=a+(a++);//等价于a=a+a,a=a++
+			console.log(a);
+			b=(b++)+b;//等价于b=b+b,b=b+1;
+			console.log(b);
+		</script>
+		
+	</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#container {
+				width: 100px;
+				height: 500px;
+				margin: 100px auto;
+				border: solid 1px;
+				position: relative;
+			}
+			
+			div#box1 {
+				width: 400px;
+				height: 100px;
+				position: absolute;
+				background: red;
+			}
+			
+			div#box2 {
+				width: 100px;
+				height: 100px;
+				top: 100px;
+				position: absolute;
+				background: green;
+			}
+		</style>
+	</head>
+
+	<body>
+		<button id="but1">向右移动</button>
+		<button id="but2">向左移动</button>
+		<button id="but3">来回</button>
+		<div id="container">
+			<div id="box1">
+
+			</div>
+			<div id="box2">
+
+			</div>
+		</div>
+		<script>
+			var but1 = document.getElementById('but1');
+			var but2 = document.getElementById('but2');
+			var moveAll;
+			var b = [];
+			but1.onclick = ff;
+
+			function ff() {
+//用间隔器
+				b[0] = setInterval(function() {
+					move('box1', -20, 'left', -100);
+					console.log(1);
+					clearInterval(b[0]);
+				}, 2000);
+				b[1] = setInterval(function() {
+					move('box1', -20, 'left', -200);
+					clearInterval(b[1]);
+
+				}, 4000);
+
+				b[2] = setInterval(function() {
+					move('box1', -20, 'left', -300);
+					clearInterval(b[2]);
+
+				}, 6000);
+
+				var b4 = setInterval(function() {
+					move('box1', -20, 'left', -400);
+					var box1 = document.getElementById('box1');
+					var width = parseInt(box1.style['left']) || 0;
+					console.log(4, width);
+
+					clearInterval(b4);
+				}, 8000);
+				var b5 = setInterval(function() {
+					move('box1', 500, 'left', 0);
+					var box1 = document.getElementById('box1');
+					var width = parseInt(box1.style['left']) || 0;
+					console.log(4, width);
+
+					clearInterval(b5);
+				}, 8200);
+			}
+
+			/*function ff() {
+//用延时器
+				b[0] = setTimeout(function() {
+					move('box1', -20, 'left', -100);
+					console.log(1);
+				}, 1000);
+				b[1] = setTimeout(function() {
+					move('box1', -20, 'left', -200);
+
+				}, 3000);
+
+				b[2] =setTimeout(function() {
+					move('box1', -20, 'left', -300);
+
+				}, 5000);
+
+				var b4 = setTimeout(function() {
+					move('box1', -20, 'left', -400);
+					var box1 = document.getElementById('box1');
+					var width = parseInt(box1.style['left']) || 0;
+					console.log(4, width);
+
+				}, 7000);
+				var b5 = setTimeout(function() {
+					move('box1', 500, 'left', 0);
+					var box1 = document.getElementById('box1');
+					var width = parseInt(box1.style['left']) || 0;
+					console.log(4, width);
+
+					clearInterval(b5);
+				}, 7200);
+			}
+*/
+			/*function ff() {
+				for(i = 0; i < 5; i++) {
+
+					b[i] = setTimeout(function() {
+						move('box1', -20, 'left', -100*i);
+						console.log(i,1000 + 2000 * i)
+					}, (1000 + 2000 * i));
+				}
+
+				var b5 = setInterval(function() {
+					move('box1', 500, 'left', 0);
+					var box1 = document.getElementById('box1');
+					var width = parseInt(box1.style['left']) || 0;
+					console.log(4, width);
+
+					clearInterval(b5);
+				}, 7200);
+			}*/
+			//				clearInterval(moveAll);
+			ff();
+			var bannners = setInterval(ff, 7200);
+			but2.onclick = function() {
+
+			};
+
+			function move(element, step, attribute, leng) {
+				clearInterval(moveAll);
+				moveAll = setInterval(function() {
+					var box1 = document.getElementById(element);
+					var width = parseInt(box1.style[attribute]) || 0;
+					box1.style[attribute] = width + step + 'px';
+					var m = parseInt(box1.style[attribute]) || 0;
+//					console.log('m', m);
+					if(step > 0) {
+						if(m > leng) {
+							box1.style[attribute] = leng + 'px';
+							clearInterval(moveAll);
+							console.log(box1.style[attribute]);
+
+						}
+					} else {
+
+						if(m <= leng) {
+							box1.style[attribute] = leng + 'px';
+							clearInterval(moveAll);
+
+						}
+					}
+				}, 40);
+
+			}
+		</script>
+	</body>
+
+</html>

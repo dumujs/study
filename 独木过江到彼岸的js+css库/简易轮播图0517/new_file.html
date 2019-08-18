@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			/*css样式表*/
+			
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#banner {
+				/*width: 540px;js设置width和height*/
+				/*height: 330px;*/
+				overflow: hidden;
+				border: solid 10px yellow;
+				/*可以修改*/
+				background: red;
+				margin: 20px auto;
+				position: relative;
+			}
+			
+			img {
+				float: left;
+			}
+			
+			#imglist {
+				position: absolute;
+			}
+			/*小圆点a标签的样式*/
+			
+			a {
+				width: 15px;
+				height: 15px;
+				text-decoration: none;
+				line-height: 15px;
+				text-align: center;
+				font-size: 12px;
+				color: white;
+				display: inline-block;
+				float: left;
+				background: black;
+				border-radius: 50%;
+				margin: 5px;
+			}
+			
+			#alist {
+				position: absolute;
+				opacity: 0.7;
+			}
+			
+			div#leftimg,
+			div#rightimg {
+				width: 30px;
+				height: 30px;
+				background: rgba(0, 0, 0, .5);
+				font-size: 25px;
+				/*让大小于号更像箭头*/
+				transform: scaleY(1.5);
+				-moz-transform: scaleY(1.5);
+				color: white;
+				text-align: center;
+				line-height: 30px;
+				position: absolute;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!--html部分-->
+		<div id="banner">
+			<!--图片随意更换，大小要一致，个数随意-->
+			<div id="imglist">
+				<img src="img1/1.jpg" />
+				<img src="img1/2.jpg" />
+				<img src="img1/3.jpg" />
+				<img src="img1/4.jpg" />
+				<img src="img1/5.jpg" />
+				<img src="img1/6.jpg" />
+				<img src="img1/7.jpg" />
+				<img src="img1/8.jpg" />
+				<!--<img src="img/1.png" alt="" />-->
+				<!--<img src="img/2.png" alt="" />-->
+				<!--<img src="img/3.png" alt="" />-->
+			</div>
+			<div id="alist">
+
+			</div>
+			<div id="leftimg">
+				&lt;
+			</div>
+			<div id="rightimg">
+				&gt;
+			</div>
+		</div>
+
+		<script>
+			//
+			window.onload = function() {
+				//获取dom相关对象
+				var banner = document.getElementById('banner');
+				var imglist = document.getElementById('imglist');
+				var img = imglist.getElementsByTagName('img');
+				var alist = document.getElementById('alist');
+				var leftimg = document.getElementById('leftimg');
+				var rightimg = document.getElementById('rightimg');
+				
+				//设置常量及变量
+				var TIME = 3000; //切换图片间隔3秒；；可以修改
+				var WIDTH = img[0].offsetWidth; //获取图片宽度为常量
+				var index = 0; //控制左右移动关键全局变量
+				//为图片设置对应的点击小圆圈
+				for(let i = 0; i < img.length; i++) {
+					alist.innerHTML += '<a href="javascript: ;">' + (i + 1) + '</a>';
+				}
+				//获取圆圈对象
+				var a = alist.getElementsByTagName('a');
+				
+				
+				a[0].style.background = 'red';
+				//			imglist.appendChild(img[0]);首位互换
+				imglist.appendChild(img[0].cloneNode(true)); //clone第一图片无缝衔接关键之处
+				imglist.style.width = img.length * WIDTH + 'px';
+				banner.style.width = img[0].offsetWidth + 'px';
+				banner.style.height = img[0].offsetHeight + 'px';
+				//定位小圆点
+				var left = banner.offsetWidth - alist.offsetWidth;
+				alist.style.left = left / 2 + 'px';
+				alist.style.bottom = 15 + 'px';
+				//定位左右箭头
+				leftimg.style.top = (img[0].offsetHeight - leftimg.offsetHeight) / 2 + 'px';
+				rightimg.style.top = (img[0].offsetHeight - leftimg.offsetHeight) / 2 + 'px';
+				rightimg.style.right = 0 + 'px';
+				//定时器设置动画效果
+				function move(obj, goalWidth) { 
+					clearInterval(obj.auto);
+					obj.auto = setInterval(function() {
+						var speed = obj.offsetLeft > goalWidth ? -15 : 15; //判断移动方向，速度是15可以修改
+						var sub = obj.offsetLeft - goalWidth;
+						//					console.log(sub);而测试
+						obj.style.left = obj.offsetLeft + speed + 'px';
+						if(Math.abs(speed) > Math.abs(sub)) {
+							obj.style.left = goalWidth + 'px';
+							clearInterval(obj.auto);
+						}
+					}, 40);
+				}
+				
+				//默认向左边滚动动画
+				function animationRight() {
+					index++;
+					dot();
+					if(index == img.length) {
+						index = 0;
+						imglist.style.left = 0;
+						index = 1;
+					}
+					move(imglist, -index * WIDTH);//调用move函数
+				}
+
+				//打开页面自动播放
+				var autopaly = setInterval(animationRight, TIME); //TIME=3000；
+				//原点与图片同步变色
+				function dot() {
+					for(var i = 0; i < a.length; i++) {
+						var circle=index % a.length==-1?a.length-1:index % a.length;
+						a[i].style.background = 'black';
+						a[circle].style.background = 'red';
+					}
+				}
+				//自动播放鼠标控制
+				banner.onmouseenter = function() {
+					clearInterval(autopaly);
+				}
+				banner.onmouseleave = function() {
+					clearInterval(autopaly);
+					autopaly = setInterval(animationRight, TIME);
+				}
+				// 点击右箭头
+				rightimg.onclick = function() {
+					animationRight();
+				}
+				//点击左箭头
+				leftimg.onclick = function() {
+					index--;
+					dot();
+					if(index == -1) {
+						index = a.length;
+						imglist.style.left = -a.length * WIDTH + 'px';
+						index = a.length - 1;
+					}
+					move(imglist, -index * WIDTH);
+				}
+				//点击数字切换图片
+				for(let j = 0; j < a.length; j++) {
+					a[j].onclick = function() {
+						index = this.innerHTML - 1;
+						dot();
+						move(imglist, -index * WIDTH);
+					}
+				}
+			}
+//来自---------独木过江到彼岸
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>中国象棋</title>
+		<style type="text/css">
+			body{
+				padding: 50px;
+				background: #eee;
+			}
+			#jia,#yi{width:410px;display: flex;justify-content: space-between;}
+		</style>
+	</head>
+	<body>
+		<h3>中国象棋</h3>
+		<div id="jia">
+			<span>9</span>
+			<span>8</span>
+			<span>7</span>
+			<span>6</span>
+			<span>5</span>
+			<span>4</span>
+			<span>3</span>
+			<span>2</span>
+			<span>1</span>
+		</div>
+		<script>
+			var chess
+			var CELL_SIZE=50;
+			var CHESS_ROWS=9;
+			var CHESS_COLS=8;
+			var chess_ctx;
+			function makeCanvas(rows,cols,cellwidth,cellheight){
+				chess=document.createElement('canvas');
+				chess.style.background='greenyellow';
+				chess.width=cols*cellwidth;
+				chess.height=rows*cellheight;
+				chess.style.border='3px solid #999';
+				chess_ctx=chess.getContext('2d');
+				chess_ctx.font='20px sans-serif';
+				chess_ctx.fillText('楚河',20,CHESS_ROWS*CELL_SIZE/2,100);
+				chess_ctx.fillText('汉界',CHESS_COLS*CELL_SIZE-50,CHESS_ROWS*CELL_SIZE/2,100);
+				chess_ctx.beginPath();
+				for(var i=1;i<rows;i++){
+					chess_ctx.moveTo(0,i*cellheight);
+					chess_ctx.lineTo(cols*cellwidth,i*cellheight);
+					if(i==2||i==7){
+						 chessSign(chess_ctx,cellwidth,i*cellheight);
+						 chessSign(chess_ctx,7*cellwidth,i*cellheight);
+					}
+					 
+					if(i==3||i==6){
+						for(var j=0;j<=8;j+=2)
+						 chessSign(chess_ctx,j*cellwidth,i*cellheight);
+						  
+					}
+//					
+				}
+				for(var i=1;i<cols;i++){
+					chess_ctx.moveTo(i*cellwidth,0);
+					chess_ctx.lineTo(i*cellwidth,4*cellheight);
+				}
+				for(var i=1;i<cols;i++){
+					chess_ctx.moveTo(i*cellwidth,5*cellheight);
+					chess_ctx.lineTo(i*cellwidth,rows*cellheight);
+					
+				}
+				//画九宫格
+				chess_ctx.moveTo(3*cellwidth,0);
+				chess_ctx.lineTo(5*cellwidth,2*cellheight);
+				chess_ctx.moveTo(5*cellwidth,0);
+				chess_ctx.lineTo(3*cellwidth,2*cellheight);
+				chess_ctx.moveTo(3*cellwidth,rows*cellheight);
+				chess_ctx.lineTo(5*cellwidth,7*cellheight);
+				chess_ctx.moveTo(5*cellwidth,rows*cellheight);
+				chess_ctx.lineTo(3*cellwidth,7*cellheight);
+				chess_ctx.strokeStyle='burlywood';
+				chess_ctx.stroke();
+			}
+			function chessSign(chess_ctx,cellwidth,cellheight){
+						chess_ctx.moveTo(cellwidth-5,cellheight-5);
+						chess_ctx.lineTo(cellwidth-5,cellheight-15);
+						chess_ctx.moveTo(cellwidth-5,cellheight-5);
+						chess_ctx.lineTo(cellwidth-15,cellheight-5);
+						
+						chess_ctx.moveTo(cellwidth+5,cellheight-5);
+						chess_ctx.lineTo(cellwidth+5,cellheight-15);
+						chess_ctx.moveTo(cellwidth+5,cellheight-5);
+						chess_ctx.lineTo(cellwidth+15,cellheight-5);
+						
+						chess_ctx.moveTo(cellwidth-5,cellheight+5);
+						chess_ctx.lineTo(cellwidth-5,cellheight+15);
+						chess_ctx.moveTo(cellwidth-5,cellheight+5);
+						chess_ctx.lineTo(cellwidth-15,cellheight+5);
+						
+						chess_ctx.moveTo(cellwidth+5,cellheight+5);
+						chess_ctx.lineTo(cellwidth+5,cellheight+15);
+						chess_ctx.moveTo(cellwidth+5,cellheight+5);
+						chess_ctx.lineTo(cellwidth+15,cellheight+5);
+			}
+			makeCanvas(9,8, CELL_SIZE, CELL_SIZE);
+			document.body.appendChild(chess);
+		</script>
+			<div id="yi">
+			<span>九</span>
+			<span>八</span>
+			<span>七</span>
+			<span>六</span>
+			<span>五</span>
+			<span>四</span>
+			<span>三</span>
+			<span>二</span>
+			<span>一</span>
+		</div>
+	</body>
+</html>

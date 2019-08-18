@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#banner {
+				width: 540px;
+				overflow: hidden;
+				height: 330px;
+				border: solid 5px black;
+				margin: 20px auto;
+				background: red;
+				padding: 10px;
+				position: relative;
+			}
+			
+			img {
+				float: left;
+				margin: 10px;
+			}
+			
+			#imglist {
+				/*width: 2240px;*/
+				position: absolute;
+				/*left: -560px;*/
+				/*-560px   -1120px    1680px   */
+			}
+			
+			a {
+				width: 15px;
+				height: 15px;
+				float: left;
+				background: white;
+				border-radius: 50%;
+				margin: 5px;
+			}
+			
+			#alist {
+				position: absolute;
+				opacity: 0.5;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="banner">
+			<div id="imglist">
+				<img src="img/1.png" />
+				<img src="img/2.png" />
+				<img src="img/3.png" />
+				<img src="img/4.png" />
+				<img src="img/1.png" />
+
+			</div>
+			<div id="alist">
+				<a href="javascript: ;"></a>
+				<a href="javascript: ;"></a>
+				<a href="javascript: ;"></a>
+				<a href="javascript: ;"></a>
+			</div>
+		</div>
+
+		<script>
+			window.onload = function() {
+				var imglist = document.getElementById('imglist');
+				var banner = document.getElementById('banner');
+				var img = imglist.getElementsByTagName('img');
+				var alist = document.getElementById('alist');
+				imglist.style.width = img.length * 560 + 'px';
+				var left = banner.offsetWidth-alist.offsetWidth;
+				//测试console.log(left);
+					alist.style.left =left/2+'px';
+					alist.style.bottom =15+'px';
+
+			}
+				var banner = document.getElementById('banner');
+			
+			var a=document.getElementsByTagName('a');
+			a[0].style.background='black';
+			var img = imglist.getElementsByTagName('img');
+			var l = img.length;
+			var s = l / 2 * l;
+			//						move('imglist', -56, 'left', -560*1);
+			function bannersMove() {
+				var i = 0;
+				var bOut2;
+				var bb = setInterval(function() {
+					var bOut = setTimeout(function() {
+						fff(bb,bOut2);
+						console.log('i', i);
+						move('imglist', -56, 'left', -560 * i);
+						af(i);
+						
+						if(i == l - 1) {
+							clearInterval(bb);
+						}
+					}, 200);
+					i++;
+					
+				}, 2000);
+				 bOut2 = setInterval(function() {
+						fff(bb,bOut2);
+					move('imglist', 560 * l, 'left', 0);
+					af(0);
+					clearInterval(bOut2);
+					console.log('22');
+				}, 450 + 2000 * (l - 1));
+
+			}
+
+			bannersMove();
+			var ban = setInterval(function(){
+				bannersMove();
+
+			} , 500 + 2000 * (l - 1));
+			
+			
+			function fff(bb,bout){
+				
+				banner.onmouseover=function(){
+					clearInterval(bb||0);
+					clearInterval(bout||0);
+				}
+			}
+			 
+			function move(element, step, attribute, leng) {
+				var moveAll;
+				clearInterval(moveAll);
+				moveAll = setInterval(function() {
+					var box1 = document.getElementById(element);
+					var width = parseInt(box1.style[attribute]) || 0;
+					//					console.log(width);
+					box1.style[attribute] = width + step + 'px';
+					var m = parseInt(box1.style[attribute]) || 0;
+					if(step > 0) {
+						if(m > leng) {
+							box1.style[attribute] = leng + 'px';
+							clearInterval(moveAll);
+						}
+					} else {
+
+						if(m <= leng) {
+							box1.style[attribute] = leng + 'px';
+							clearInterval(moveAll);
+
+						}
+					}
+				}, 20);
+			}
+			
+			function af(i){
+				
+				for(var j=0;j<a.length;j++){
+//					console.log('af',1);
+					if(j==i){
+						a[i].style.background='black';
+					}
+					else{
+						a[j].style.background='white';
+					}
+				}
+			}
+			
+			
+			/*for(var j=0; j<a.length;j++){
+				a[j].onclick{
+					
+				}
+			}*/
+		</script>
+
+	</body>
+
+</html>

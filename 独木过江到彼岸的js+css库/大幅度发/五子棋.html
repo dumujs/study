@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			五子棋
+		</title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			body {
+				padding-left: 100px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h3>五子棋</h3>
+		<div id="tishi">
+			<span>黑方</span>
+			<span>白方</span> 倒计时：
+			<span></span> 胜负:
+			<span></span>
+		</div>
+		<div id="choose">
+			玩家选择
+			<button id="heifang">黑方</button>
+			<button id="baifang">白方</button>
+			<button id="back">悔棋</button>
+		</div>
+		<script>
+			//canvas画板
+			var fiveChess;
+			//canvascontext线条
+			var fiveChess_ctx;
+			//当前步棋谱数组
+			var fiveArr = [];
+			//当前局棋谱
+			var thisRoundArr = [];
+			//悔棋
+			var goBack = 0;
+			//获取空位
+			var comArr = [];
+			//高分空位
+			var heightArr = [];
+			//最高分
+			var heightScore = 0;
+			//玩家
+			var PLAYER = 0;
+			//			电脑定时器
+			var comtimer;
+			//玩家倒计时
+			var timer;
+			//游戏是否结束
+			var isPlaying = true;
+			//空位
+			var KONG = 0;
+			//画板数据
+			var ROWS = 19;
+			var COLS = 19;
+			var SIZE = 30;
+			var colors = ['transparent', '#333', '#fff'];
+			//棋子
+			var BLACK = 1;
+			var WHITE = 2;
+			//等待一方
+			var NOTURN = 0;
+			//轮到的一方默认黑子先行
+			var TURN = BLACK;
+			//清空棋盘
+			for(var i = 0; i < ROWS; i++) {
+				fiveArr[i] = [];
+				for(var j = 0; j < COLS; j++) {
+					fiveArr[i][j] = {
+						color: KONG,
+						value: 0
+					};
+				}
+			}
+			//绘制空棋盘
+			function makeCanvas(row, col, cellwidth, cellheight) {
+				fiveChess.style.padding = '10px';
+				fiveChess.style.background = '#a9a9a9';
+				fiveChess.width = (col - 1) * cellwidth + 20;
+				fiveChess.height = (row - 1) * cellheight + 20;
+				fiveChess.style.border = '2px solid #ff9900';
+				fiveChess_ctx = fiveChess.getContext('2d');
+				fiveChess_ctx.beginPath();
+				for(var i = 0; i < col; i++) {
+					fiveChess_ctx.moveTo(i * cellwidth + 10, 10);
+					fiveChess_ctx.lineTo(i * cellwidth + 10, (row - 1) * cellheight + 10);
+				}
+				for(var i = 0; i < row; i++) {
+					fiveChess_ctx.moveTo(10, i * cellheight + 10);
+					fiveChess_ctx.lineTo((col - 1) * cellwidth + 10, i * cellheight + 10);
+				}
+				fiveChess_ctx.strokeStyle = '#ffcc00';
+				fiveChess_ctx.stroke();
+			}
+			//绘制开局图形
+			function showCanvas() {
+				for(var i = 0; i < ROWS; i++) {
+					for(var j = 0; j < COLS; j++) {
+						if(fiveArr[i][j].color) {
+							fiveChess_ctx.beginPath();
+							fiveChess_ctx.arc(j * SIZE + 10, i * SIZE + 10, 10, 0, Math.PI * 2, false);
+							fiveChess_ctx.fillStyle = colors[fiveArr[i][j].color];
+							fiveChess_ctx.fill();
+						}
+					}
+				}
+			}
+
+			//判定胜负
+			function isfinish() {
+				var sheng = 0;
+				for(var i = 0; i < ROWS; i++) {
+					for(var j = 0; j < COLS; j++) {
+						sheng = acrossConcat(i, j, 0, 4, TURN) && fiveArr[i][j].color == TURN;
+						if(sheng) {
+							isPlaying = 0;
+							return;
+						}
+						sheng = fiveArr[i][j].color == TURN && upConcat(i, j, 0, 4, TURN);
+						if(sheng) {
+							isPlaying = 0;
+							return;
+						}
+						sheng = fiveArr[i][j].color == TURN && leftDownConcat(i, j, 0, 4, TURN);
+						if(sheng) {
+							isPlaying = 0;
+							return;
+						}
+						sheng = fiveArr[i][j].color == TURN && leftUpConcat(i, j, 0, 4, TURN);
+						if(sheng) {
+							isPlaying = 0;
+							return;
+						}
+					}
+				}
+			}
+
+			//电脑算法设计开始
+
+			//1--若干棋子水平相连
+			function acrossConcat(x, y, start, end, TURN) {
+				var flag = true;
+				for(var i = start; i <= end; i++) {
+					if(i) {
+						flag = flag && ((((fiveArr[x] || 0)[y + i]) || 0).color || 0) == TURN;
+					}
+				}
+				return flag;
+			}
+			//2--竖立相连
+			function upConcat(x, y, start, end, TURN) {
+				var flag = true;
+				for(var i = start; i <= end; i++) {
+					if(i) {
+						flag = flag && ((((fiveArr[x + i] || 0)[y]) || 0).color || 0) == TURN;
+					}
+				}
+				return flag;
+			}
+			//3--从左下到右上
+			function leftDownConcat(x, y, start, end, TURN) {
+				var flag = true;
+				for(var i = start; i <= end; i++) {
+					if(i) {
+						flag = flag && ((((fiveArr[x + i] || 0)[y - i]) || 0).color || 0) == TURN;
+					}
+				}
+				return flag;
+			}
+			//4--从左上到右下
+			function leftUpConcat(x, y, start, end, TURN) {
+				var flag = true;
+				for(var i = start; i <= end; i++) {
+					if(i) {
+						flag = flag && ((((fiveArr[x + i] || 0)[y + i]) || 0).color || 0) == TURN;
+					}
+				}
+				return flag;
+			}
+
+			//指定位置基础分值
+			function concat(arr, x, y, n) {
+				for(k = 1; k <= 2; k++) {
+					if(x + k < ROWS) {
+						arr[x + k][y].value += n * !arr[x + k][y].color;
+					}
+					if(y + k < COLS) {
+						arr[x][y + k].value += n * !arr[x][y + k].color;
+					}
+					if(x - k >= 0) {
+						arr[x - k][y].value += n * !arr[x - k][y].color;
+					}
+					if(y - k >= 0) {
+						arr[x][y - k].value += n * !arr[x][y - k].color;
+					}
+					if(x + k < ROWS && y + k < COLS) {
+						arr[x + k][y + k].value += n * !arr[x + k][y + k].color;
+					}
+					if(y + k < COLS && x - k >= 0) {
+						arr[x - k][y + k].value += n * !arr[x - k][y + k].color;
+					}
+					if(x - k >= 0 && y - k >= 0) {
+						arr[x - k][y - k].value += n * !arr[x - k][y - k].color;
+					}
+					if(y - k >= 0 && x + k < ROWS) {
+						arr[x + k][y - k].value += n * !arr[x + k][y - k].color;
+					}
+				}
+			}
+			//5子相连分值
+			function fiveConcat(arr, x, y, n) {
+				var fiveNum = 0;
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = acrossConcat(x, y, k, k + 4, TURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 10;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = upConcat(x, y, k, k + 4, TURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 10;
+					}
+				}
+
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = leftUpConcat(x, y, k, k + 4, TURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 10;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = leftDownConcat(x, y, k, k + 4, TURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 10;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = acrossConcat(x, y, k, k + 4, NOTURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 5;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = upConcat(x, y, k, k + 4, NOTURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 5;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = leftDownConcat(x, y, k, k + 4, NOTURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 5;
+					}
+				}
+				for(var k = -4; k <= 0; k++) {
+					fiveNum = leftUpConcat(x, y, k, k + 4, NOTURN);
+					if(fiveNum) {
+						return arr[x][y].value = n * 5;
+					}
+				}
+
+				return false;
+			}
+
+			//数子相连
+			//水平
+			function someAcross(arr, some, x, y, other , n) {
+				var someNum = 0;
+				var isLive = 0;
+				var isDie = 0;
+				for(var k = -some; k <= 0; k++) {
+					someNum = acrossConcat(x, y, k, k + some, other);
+					isLive = ((((arr[x] || 0)[y + k - 1]) || 0).color || 0) == KONG && ((((arr[x] || 0)[y + k + some + 1]) || 0).color || 0) == KONG;
+					isDie = ((((arr[x] || 0)[y + k - 1]) || 0).color || 0) !=KONG && ((((arr[x] || 0)[y + k + some + 1]) || 0).color || 0) !=KONG;
+					if(someNum) {
+						if(isDie) {
+							return arr[x][y].value += 0;
+						}
+						if(y + k - 1 < 0) {
+							if(arr[x][y + k + some + 1].color!=KONG) {
+								return arr[x][y].value += 0;
+
+							} else {
+								return arr[x][y].value += n/5;
+							}
+						}
+						if(y + k + some + 1 == ROWS) {
+							if(arr[x][y + k - 1].color!=KONG) {
+								return arr[x][y].value += 0;
+							} else {
+								return arr[x][y].value += n/5;
+							}
+						}
+						if(isLive) {
+							return arr[x][y].value += n * 5;
+
+						} else {
+							return arr[x][y].value += n / 5;
+						}
+					}
+				}
+			}
+			function someJumpAcross(arr, some, x, y, other , n) {
+				var someNum = 0;
+				var isLive = 0;
+				var isDie = 0;
+				for(var k = -some; k <= 0; k++) {
+					someNum = acrossConcat(x, y, k, k + some, other);
+					isLive = ((((arr[x] || 0)[y + k - 1]) || 0).color || 0) == KONG && ((((arr[x] || 0)[y + k + some + 1]) || 0).color || 0) == KONG;
+					isDie = ((((arr[x] || 0)[y + k - 1]) || 0).color || 0) !=KONG && ((((arr[x] || 0)[y + k + some + 1]) || 0).color || 0) !=KONG;
+					if(someNum) {
+						if(isDie) {
+							return arr[x][y].value += 0;
+						}
+						if(y + k - 1 < 0) {
+							if(arr[x][y + k + some + 1].color!=KONG) {
+								return arr[x][y].value += 0;
+
+							} else {
+								return arr[x][y].value += n/5;
+							}
+						}
+						if(y + k + some + 1 == ROWS) {
+							if(arr[x][y + k - 1].color!=KONG) {
+								return arr[x][y].value += 0;
+							} else {
+								return arr[x][y].value += n/5;
+							}
+						}
+						if(isLive) {
+							return arr[x][y].value += n * 5;
+
+						} else {
+							return arr[x][y].value += n / 5;
+						}
+					}
+				}
+			}
+			//垂直
+			
+			function someUp(arr, some, x, y, other , n) {
+				var someNum = 0;
+				var isLive = 0;
+				var isDie = 0;
+				for(var k = -some; k <= 0; k++) {
+					someNum = upConcat(x, y, k, k + some, other);
+					isLive = ((((arr[x + k - 1] || 0)[y]) || 0).color || 0) == KONG && ((((arr[x + k + some + 1] || 0)[y]) || 0).color || 0) == KONG;
+					isDie = ((((arr[x + k - 1] || 0)[y]) || 0).color || 0) !=KONG && ((((arr[x + k + some + 1] || 0)[y]) || 0).color || 0) !=KONG;
+					if(someNum) {
+						if(isDie) {
+							return arr[x][y].value += 0;
+						}
+						if(x + k - 1 < 0) {
+							if(arr[x + k + some + 1][y].color !=KONG) {
+								return arr[x][y].value += 0;
+
+							} else {
+								return arr[x][y].value += n / 5;
+							}
+						}
+						if(x + k + some + 1 == ROWS) {
+							if(arr[x + k - 1][y].color !=KONG) {
+								return arr[x][y].value += 0;
+							} else {
+								return arr[x][y].value += n / 5;
+							}
+						}
+						if(isLive) {
+							return arr[x][y].value += n * 5;
+
+						} else {
+							return arr[x][y].value += n / 5;
+						}
+					}
+				}
+			}
+			//左上开始
+			function someLeftUp(arr, some, x, y, other , n) {
+				var someNum = 0;
+				var isLive = 0;
+				var isDie = 0;
+				for(var k = -some; k <= 0; k++) {
+					someNum = leftUpConcat(x, y, k, k + some, other);
+					isLive = ((((arr[x + k - 1] || 0)[y + k - 1]) || 0).color || 0) == KONG && ((((arr[x + k + some + 1] || 0)[y + k + some + 1]) || 0).color || 0) == KONG;
+					isDie = ((((arr[x + k - 1] || 0)[y + k - 1]) || 0).color || 0) !=KONG && ((((arr[x + k + some + 1] || 0)[y + k + some + 1]) || 0).color || 0) !=KONG;
+					if(someNum) {
+						if(isDie) {
+							return arr[x][y].value += 0;
+						}
+						if(x + k - 1 < 0) {
+							if(y + k + some + 1 == COLS) {
+								return arr[x][y].value += 0;
+							}
+							if(arr[x + k + some + 1][y + k + some + 1].color !=KONG) {
+								return arr[x][y].value += 0;
+							}
+						}
+						if(x + k + some + 1 == ROWS) {
+							if(y + k - 1 < 0) {
+								return arr[x][y].value += 0;
+							}
+							if(arr[x + k - 1][y + k - 1].color !=KONG) {
+								return arr[x][y].value += 0;
+
+							}
+						}
+						if(isLive) {
+							return arr[x][y].value += n * 5;
+
+						} else {
+							return arr[x][y].value += n / 5;
+						}
+					}
+				}
+			}
+			//左下开始
+			
+			function someLeftDown(arr, some, x, y, other , n) {
+				var someNum = 0;
+				var isLive = 0;
+				var isDie = 0;
+				for(var k = -some; k <= 0; k++) {
+					someNum = leftDownConcat(x, y, k, k + some, other);
+					isLive = ((((arr[x + k - 1] || 0)[y - k + 1]) || 0).color || 0) == KONG && ((((arr[x + k + some + 1] || 0)[y - k - some - 1]) || 0).color || 0) == KONG;
+					isDie = ((((arr[x + k - 1] || 0)[y - k + 1]) || 0).color || 0) !=KONG && ((((arr[x + k + some + 1] || 0)[y - k - some - 1]) || 0).color || 0) !=KONG;
+					if(someNum) {
+						if(isDie) {
+							return arr[x][y].value += 0;
+						}
+						if(x + k - 1 < 0) {
+							if(y - k + 1 == COLS) {
+								return arr[x][y].value += 0;
+							}
+							if(arr[x + k + some + 1][y - k + 1].color !=KONG) {
+								return arr[x][y].value += 0;
+							}
+						}
+						if(x + k + some + 1 == ROWS) {
+							if(y - k + 1 == COLS) {
+								return arr[x][y].value += 0;
+							}
+							if(arr[x + k - 1][y - k + 1].color !=KONG) {
+								return arr[x][y].value += 0;
+							}
+						}
+						if(isLive) {
+							return arr[x][y].value += n * 5;
+
+						} else {
+							return arr[x][y].value += n / 5;
+						}
+					}
+				}
+			}
+
+
+
+
+			function fourConcat(arr, x, y, n) {
+				someAcross(arr, 3, x, y, TURN, n);
+				someAcross(arr, 3, x, y, NOTURN, n / 2);
+				someUp(arr, 3, x, y, TURN, n);
+				someUp(arr, 3, x, y, NOTURN,n / 2);
+				someLeftDown(arr, 3, x, y, TURN,  n);
+				someLeftDown(arr, 3, x, y, NOTURN,  n / 2);
+				someLeftUp(arr, 3, x, y, TURN,  n);
+				someLeftUp(arr, 3, x, y, NOTURN,  n / 2);
+			}
+
+			function threeConcat(arr, x, y, n) {
+				someAcross(arr, 2, x, y, TURN,  n);
+				someAcross(arr, 2, x, y, NOTURN,  n / 2);
+				someUp(arr, 2, x, y, TURN,  n);
+				someUp(arr, 2, x, y, NOTURN,  n / 2);
+				someLeftDown(arr, 2, x, y, TURN, n);
+				someLeftDown(arr, 2, x, y, NOTURN,  n / 2);
+				someLeftUp(arr, 2, x, y, TURN,  n);
+				someLeftUp(arr, 2, x, y, NOTURN, n / 2);
+			}
+
+			function twoConcat(arr, x, y, n) {
+				someAcross(arr, 1, x, y, TURN, n);
+				someAcross(arr, 1, x, y, NOTURN, n / 2);
+				someUp(arr, 1, x, y, TURN,  n);
+				someUp(arr, 1, x, y, NOTURN,  n / 2);
+				someLeftDown(arr, 1, x, y, TURN, n);
+				someLeftDown(arr, 1, x, y, NOTURN,  n / 2);
+				someLeftUp(arr, 1, x, y, TURN,  n);
+				someLeftUp(arr, 1, x, y, NOTURN,  n / 2);
+			}
+			//计算每个位置的分值
+			function positonValue() {
+				NOTURN = TURN == BLACK ? WHITE : BLACK;
+				for(var i = 0; i < ROWS; i++) {
+					for(var j = 0; j < COLS; j++) {
+						fiveArr[i][j].value = 0;
+					}
+				}
+				for(var i = 0; i < ROWS; i++) {
+					var flag = 0;
+					for(var j = 0; j < COLS; j++) {
+						if(fiveArr[i][j].color == TURN) {
+							concat(fiveArr, i, j, 1);
+						} else if(fiveArr[i][j].color) {
+							concat(fiveArr, i, j, 1);
+						} else {
+							fiveConcat(fiveArr, i, j, 10000);
+							flag = fiveConcat(fiveArr, i, j, 10000);
+							if(!flag) {
+								fourConcat(fiveArr, i, j, 1000);
+								threeConcat(fiveArr, i, j, 100);
+								twoConcat(fiveArr, i, j, 10);
+							}
+						}
+					}
+				}
+			}
+			//电脑落子算法
+			function computer() {
+				positonValue();
+				comArr = [];
+				var nowArr = [];
+				heightScore = 0;
+				for(var i = 0; i < ROWS; i++) {
+					for(var j = 0; j < COLS; j++) {
+
+						if(fiveArr[i][j].color == KONG) {
+							comArr.push({
+								x: i,
+								y: j,
+								value: parseInt(fiveArr[i][j].value)
+							});
+							if(heightScore < parseInt(fiveArr[i][j].value)) {
+								heightScore = parseInt(fiveArr[i][j].value);
+							}
+						}
+					}
+				}
+				//				console.log(comArr);
+				for(var j = 0; j < comArr.length; j++) {
+					//					alert(comArr[j].value==heightScore);
+					if(comArr[j].value == heightScore) {
+						nowArr.push({
+							x: comArr[j].x,
+							y: comArr[j].y,
+							value: comArr[j].value
+						});
+					}
+				}
+				console.log(heightScore);
+				if(comArr.length==361){
+					var x = parseInt(3 * Math.random()+7);
+					var y = parseInt(3 * Math.random()+7);
+				}else{
+					
+					var comPosition = parseInt(nowArr.length * Math.random());
+					var x = nowArr[comPosition].x;
+					var y = nowArr[comPosition].y;
+				}
+				
+				fiveChess_ctx.beginPath();
+				fiveChess_ctx.arc(y * SIZE + 10, x * SIZE + 10, 10, 0, Math.PI * 2, false);
+				fiveChess_ctx.fillStyle = colors[TURN];
+				fiveChess_ctx.fill();
+				fiveArr[x][y].color = TURN;
+				isfinish();
+				if(isPlaying == 0) {
+					var who = ['', '黑方胜利', '白方胜利'][TURN];
+					tishi.children[3].innerHTML = who;
+					localStorage.removeItem('thisRoundArr');
+					localStorage.removeItem('lastArr');
+					localStorage.removeItem('turn');
+					clearInterval(timer);
+					clearInterval(comtimer);
+				} else {
+					TURN = (TURN == BLACK) ? WHITE : BLACK;
+					var roundArr = localStorage.thisRoundArr;
+					thisRoundArr = roundArr ? JSON.parse(roundArr) : thisRoundArr;
+					thisRoundArr.push(fiveArr);
+					localStorage.setItem('lastArr', JSON.stringify(fiveArr));
+					localStorage.setItem('thisRoundArr', JSON.stringify(thisRoundArr));
+					localStorage.setItem('turn', TURN);
+				}
+			}
+			//onload页面加载
+			window.onload = function() {
+				fiveChess = document.createElement('canvas');
+				var back = document.getElementById('back');
+				var heifang = document.getElementById('heifang');
+				var baifang = document.getElementById('baifang');
+				var tishi = document.getElementById('tishi');
+				var choose = document.getElementById('choose');
+				comtimer = setInterval(function() {
+					if(TURN != PLAYER && PLAYER != 0) {
+						computer();
+					}
+				}, 1000)
+				choose.onclick = function(e) {
+					var et = e || window.event;
+					if(et.target.id == 'baifang') {
+						PLAYER = WHITE;
+						this.children[0].style.background = '';
+						et.target.style.background = 'red';
+					}
+					if(et.target.id == 'heifang') {
+						PLAYER = BLACK;
+						this.children[1].style.background = '';
+						et.target.style.background = 'red';
+					}
+					if(et.target.id == 'back') {
+						if(thisRoundArr.length > 2) {
+							var roundArr = localStorage.thisRoundArr;
+							thisRoundArr = roundArr ? JSON.parse(roundArr) : thisRoundArr;
+							thisRoundArr.pop();
+							thisRoundArr.pop();
+							fiveArr = thisRoundArr.slice(thisRoundArr.length - 1, thisRoundArr.length)[0];
+							localStorage.setItem('lastArr', JSON.stringify(fiveArr));
+							localStorage.setItem('thisRoundArr', JSON.stringify(thisRoundArr));
+							clearInterval(timer);
+							this.children[1].style.background = '';
+							et.target.style.background = 'red';
+							makeCanvas(ROWS, COLS, SIZE, SIZE);
+							showCanvas();
+						} else {
+							localStorage.removeItem('lastArr');
+							localStorage.removeItem('thisRoundArr');
+							localStorage.removeItem('turn');
+							TURN=BLACK;
+							thisRoundArr = [];
+							for(var i = 0; i < ROWS; i++) {
+								fiveArr[i] = [];
+								for(var j = 0; j < COLS; j++) {
+									fiveArr[i][j] = {
+										color: KONG,
+										value: 0
+									};
+								}
+							}
+							makeCanvas(ROWS, COLS, SIZE, SIZE);
+							showCanvas();
+						}
+					}
+				}
+				makeCanvas(ROWS, COLS, SIZE, SIZE);
+				document.body.appendChild(fiveChess);
+				var lastArr = localStorage.lastArr;
+				var roundArr = localStorage.thisRoundArr;
+				thisRoundArr = roundArr ? JSON.parse(roundArr) : thisRoundArr;
+				fiveArr = lastArr ? JSON.parse(lastArr) : fiveArr;
+				//				console.log(fiveArr);
+				showCanvas();
+				TURN = localStorage.turn ? localStorage.turn : TURN;
+				fiveChess.onmousedown = function(e) {
+					var et = e || window.event;
+					clearInterval(timer);
+					var x = parseInt((et.pageX - this.offsetLeft - 10) / SIZE);
+					var y = parseInt((et.pageY - this.offsetTop - 10) / SIZE);
+					if(isPlaying && fiveArr[y][x].color == 0) {
+						if(TURN == PLAYER || PLAYER == 0) {
+							positonValue();
+							var jishi = 300;
+							fiveChess_ctx.beginPath();
+							fiveChess_ctx.arc(x * SIZE + 10, y * SIZE + 10, 10, 0, Math.PI * 2, false);
+							fiveChess_ctx.fillStyle = colors[TURN];
+							fiveChess_ctx.fill();
+							fiveArr[y][x].color = TURN;
+							positonValue();
+							timer = setInterval(function() {
+								if(jishi == 0) {
+									var shu = ['', '黑方认输', '白方认输'][TURN];
+									tishi.children[3].innerHTML = shu;
+									isPlaying = 0;
+									localStorage.removeItem('lastArr');
+									localStorage.removeItem('thisRoundArr');
+									localStorage.removeItem('turn');
+									clearInterval(timer);
+								}
+								tishi.children[2].innerHTML = jishi--;
+
+							}, 1000)
+							isfinish();
+							if(isPlaying == 0) {
+								var who = ['', '黑方胜利', '白方胜利'][TURN];
+								tishi.children[3].innerHTML = who;
+								localStorage.removeItem('lastArr');
+								localStorage.removeItem('thisRoundArr');
+								localStorage.removeItem('turn');
+								clearInterval(timer);
+								clearInterval(comtimer);
+							} else {
+								TURN = (TURN == BLACK) ? WHITE : BLACK;
+								var roundArr = localStorage.thisRoundArr;
+								thisRoundArr = roundArr ? JSON.parse(roundArr) : thisRoundArr;
+								thisRoundArr.push(fiveArr);
+								localStorage.setItem('lastArr', JSON.stringify(fiveArr));
+								localStorage.setItem('thisRoundArr', JSON.stringify(thisRoundArr));
+								localStorage.setItem('turn', TURN);
+							}
+						}
+					}
+				}
+			}
+			//独木过江到彼岸---五子棋版本号：2019.1.0
+		</script>
+	</body>
+
+</html>

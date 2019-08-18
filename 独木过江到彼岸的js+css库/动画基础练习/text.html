@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#container {
+				width: 800px;
+				height: 400px;
+				border: solid 1px;
+				position: relative;
+			}
+			
+			#container div {
+				width: 10px;
+				height: 10px;
+				top:390px;
+				left:50%;
+				position: absolute;
+				background: red;
+			}
+			 
+			 
+		</style>
+	</head>
+
+	<body>
+		<button id="but1">向左射击</button>
+		<button id="but2">向右射击</button>
+		<button id="but3">向上射击</button>
+		<button id="but4">左移</button>
+		<button id="but5">右移</button>
+		<button id="but6">结束</button>
+		<div id="container">
+			<div id="box">
+				
+			</div>
+			 
+		</div>
+		<script>
+			var but1 = document.getElementById('but1');
+			var but2 = document.getElementById('but2');
+			var but3 = document.getElementById('but3');
+			var but4 = document.getElementById('but4');
+			var but5 = document.getElementById('but5');
+			var but6 = document.getElementById('but6');
+			var container=document.getElementById('container');
+			 
+			var box0=document.getElementById('box');
+			but1.onclick = function(){
+				var add=box0.cloneNode((true));
+				container.appendChild(add);
+				move(add,5,0,'left',function(){
+				 container.removeChild(container.children[1]);
+				 
+				});
+				
+			}
+			but2.onclick = function() {
+				var add=box0.cloneNode((true));
+				container.appendChild(add);
+				move(add,5,790,'left',function(){
+				 container.removeChild(container.children[1]);
+				});
+			}
+			but3.onclick = function(){
+				var add=box0.cloneNode((true));
+				container.appendChild(add);
+				move(add,5,0,'top',function(){
+				 container.removeChild(container.children[1]);
+				 
+				});
+			}
+			 
+			 
+			function move (obj,speed,target,att,callback){
+				clearInterval(obj.auto);
+				var offsetAtt;
+				for(var i=0;i<att.length;i++){
+					if(i==0){
+						offsetAtt=att[0].toUpperCase();
+						continue;
+					}
+					offsetAtt+=att[i];
+				}
+				var a=obj[('offset'+offsetAtt)];
+				speed=target-a>0?speed:-speed;
+				obj.auto=setInterval(function(){
+					if(Math.abs(target-obj[('offset'+offsetAtt)])<Math.abs(speed)){
+						obj.style[att]=target+'px';
+						clearInterval(obj.auto);
+						callback&&callback();
+					}else{
+						obj.style[att]=obj[('offset'+offsetAtt)]+speed+'px';
+					}
+				},30)
+			}
+			 
+		</script>
+	</body>
+
+</html>
