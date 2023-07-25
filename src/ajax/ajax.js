@@ -1,20 +1,20 @@
 (function(tool){
-	function myAjax(obj callback){
+	function myAjax(obj = {}, callback){
 		//first
-		var xhr=new XMLHttpRequest();
-		var mothed=obj.mothed;
-		var isSync=obj.isSync;
-		var url=obj.url;
-		var data=obj.data;
-		var headSetting=obj.headSetting;
+		const xhr=new XMLHttpRequest();
+		const method=obj.method;
+		const isSync=obj.isSync;
+		const url=obj.url;
+		const data=obj.data;
+		const {headSetting}=obj;
 		//second
 		if(isSync){
-			xhr.open(mothed,url,isSync);
+			xhr.open(method,url,isSync);
 		}else{
-			xhr.open(mothed,url);
+			xhr.open(method,url);
 		}
 		if(headSetting){
-			for(key in headSetting){
+			for(let key in headSetting){
 				xhr.setRequestHeader(key,headSetting[key]);
 			}
 		}
@@ -24,11 +24,10 @@
 		xhr.onreadystatechange=function(event){
 			if(xhr.readyState==4){
 				console.log(xhr.responseText);
-				var returnData=xhr.responseText;
+				const returnData=xhr.responseText;
 				callback&&callback(returnData);
 			}
 		}
 	}
-	var tool={};
 	tool.ajax=myAjax;
 })(window.tool||{});
