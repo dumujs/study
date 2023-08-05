@@ -1,4 +1,4 @@
-package com.pyj;
+package com.base;
 
 public class BaseDataType {
 
