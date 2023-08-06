@@ -37,10 +37,10 @@ public class Arithmetic {
         int a = 10;
         double d = 12.30;
         System.out.println(a + d);
+        //数据类型转换
         byte b1 = 11;
         byte b2 = 12;
         int sum = b1 + b2;
-        //数据类型转换
         System.out.println(sum);
         byte sumByte =  (byte) (b1 + b2);
         System.out.println((char) sumByte);
