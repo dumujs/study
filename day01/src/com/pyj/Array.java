@@ -24,9 +24,23 @@ public class Array {
             arr[num] = temp;
         }
         System.out.println(Arrays.toString(arr) + arr.length);
+        copyOfRange(arr, 0, 5);
     }
 
     public static void sum() {
         System.out.println("sum");
+    }
+
+    /**
+     * copy数组
+     */
+    public static <T> int[] copyOfRange(int[] arr, int start, int end) {
+        System.out.println(Arrays.toString(arr));
+        int[] result = new int[end - start];
+        for (int i = start; i < end; i++){
+            result[i - start] = arr[i];
+        }
+        System.out.println(Arrays.toString(result));
+        return result;
     }
 }
