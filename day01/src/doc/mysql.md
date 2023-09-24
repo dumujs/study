@@ -41,11 +41,11 @@ cmd mysql create 数据库名;
 6.1 定义数据库
 ```shell
 show databases;
-create database db01; #不可重复
-create database if not exists db01; #不存在就创建
+create doc db01; #不可重复
+create doc if not exists db01; #不存在就创建
 #use 数据库名称;
-select database(); #查看数据库名称
-drop database if not exists db01;
+select doc(); #查看数据库名称
+drop doc if not exists db01;
 ```
 6.2 定义表
 ```shell
